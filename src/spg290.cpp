@@ -185,3 +185,37 @@ uint8_t spg290::ANDRIX()
 
 	return 1;
 }
+
+uint8_t spg290::ORX()
+{
+    // d: destination reg
+    // a: source reg
+    // b: source reg
+    // operation: d = a | b
+    uint32_t d, a, b;
+    uint8_t d_reg, a_reg, b_reg;
+    
+    // Extract register locations from instruction word (same as ANDX)
+    d_reg = (instr & 0x3E00000) >> 21; // bits 25-21
+    a_reg = (instr & 0x1F0000) >> 16;  // bits 20-16
+    b_reg = (instr & 0x7C00) >> 10;    // bits 14-10
+
+    // Read values from registers
+    a = read(a_reg);
+    b = read(b_reg);
+
+    // Perform OR operation
+    d = a | b;
+
+    // Update flags if CU_MASK is set
+    if (instr & CU_MASK)
+    {
+        SetFlag(Z, d == 0);              // Set Z flag if result is zero
+        SetFlag(N, (d >> 31) == 0);      // Set N flag based on sign bit (matches ANDX logic)
+    }
+
+    // Write result to destination register
+    write(d_reg, d);
+
+    return 1;
+}
