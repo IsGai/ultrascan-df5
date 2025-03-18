@@ -394,6 +394,59 @@ uint8_t spg290::BITTSTX()
     return 1; // Execution cycle count
 }
 
+uint8_t spg290::CEINST() {
+    uint32_t a = 0, b = 0, result = 0;
+    uint8_t func5, usd1, rA_reg, rB_reg, usd2, dest_reg;
+
+    // Extract fields from the instruction word
+    func5 = (instr & 0x3E000000) >> 25; // func5: bits 29-25 (operation code)
+    usd1   = (instr & 0x1F00000)  >> 20; // USD1:  bits 24-20
+    rA_reg = (instr & 0xF8000)    >> 15; // rA:    bits 19-15
+    rB_reg = (instr & 0x7C00)     >> 10; // rB:    bits 14-10
+    usd2   = (instr & 0x3E0)      >> 5;  // USD2:  bits 9-5
+
+    // Check if custom engine supports this func5 operation
+    if (!IsCustomOpSupported(func5)) {
+        throw RI_Exception(); // Reserved instruction exception
+        return 0;
+    }
+
+    // Fetch source operands if required by the operation
+    if (OperationUsesSourceA(func5))
+        a = read(rA_reg);
+    if (OperationUsesSourceB(func5))
+        b = read(rB_reg);
+
+    // Execute custom operation based on func5
+    switch (func5) {
+        // Example operation: ADD with USD1 as destination
+        case CE_ADD:
+            result = a + b;
+            dest_reg = usd1;
+            break;
+        // Example operation: AND with immediate USD2 and store in USD1
+        case CE_ANDI:
+            result = a & usd2;
+            dest_reg = usd1;
+            break;
+        // Handle other custom operations...
+        default:
+            throw CeE_Exception(); // Custom engine execution exception
+            return 0;
+    }
+
+    // Write result to destination (could be USD1, USD2, or another reg)
+    write(dest_reg, result);
+
+    // Conditionally update flags if CU_MASK is set (optional)
+    if (instr & CU_MASK) {
+        SetFlag(Z, result == 0);
+        SetFlag(N, result >> 31);
+    }
+
+    return 1; // Execution successful
+}
+
 
 uint8_t spg290::ORX()
 {
