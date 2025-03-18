@@ -190,6 +190,40 @@ uint8_t spg290::ADDISX()
     return 1;
 }
 
+uint8_t spg290::ADDRIX()
+{
+    uint32_t d, a;
+    int32_t imm14;
+    uint8_t d_reg, a_reg;
+
+    // Extract destination and source registers from instruction word
+    d_reg = (instr & 0x3E00000) >> 21;  // Bits 25-21 for rD
+    a_reg = (instr & 0x1F0000) >> 16;  // Bits 20-16 for rA
+
+    // Extract 14-bit signed immediate (bits 13-0)
+    imm14 = instr & 0x3FFF;
+    // Sign-extend the 14-bit value to 32 bits
+    imm14 = (imm14 << 18) >> 18;
+
+    // Read value from source register rA
+    a = read(a_reg);
+
+    // Perform addition: d = a + sign-extended imm14
+    d = a + imm14;
+
+    // Update condition flags if the CU bit is set
+    if (instr & CU_MASK)
+    {
+        SetFlag(Z, d == 0);               // Set Z flag if result is zero
+        SetFlag(N, (d >> 31) == 0);       // Set N flag based on sign bit (as per ANDX example)
+    }
+
+    // Write the result to destination register rD
+    write(d_reg, d);
+
+    return 1;  // Execution completed successfully
+}
+
 uint8_t spg290::ANDX()
 {
 	// d: destination reg
