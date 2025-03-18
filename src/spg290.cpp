@@ -120,6 +120,40 @@ uint8_t spg290::ADDCX()
     return 1;  // Return cycle count or status
 }
 
+uint8_t spg290::ADDIX()
+{
+    uint8_t d_reg;
+    uint32_t d_val;
+    int32_t imm;
+
+    // Extract destination register from bits 25-21
+    d_reg = (instr & 0x3E00000) >> 21;
+
+    // Extract 16-bit signed immediate and sign-extend to 32 bits
+    imm = (int16_t)(instr & 0xFFFF);
+    uint32_t sign_extended_imm = (uint32_t)imm;
+
+    // Read the current value of the destination register
+    d_val = read(d_reg);
+
+    // Perform the addition
+    d_val += sign_extended_imm;
+
+    // Check if the CU bit is set to update condition flags
+    if (instr & CU_MASK)
+    {
+        // Set Z flag if the result is zero
+        SetFlag(Z, d_val == 0);
+        // Set N flag if the result is non-negative (based on MSB)
+        SetFlag(N, (d_val >> 31) == 0);
+    }
+
+    // Write the result back to the destination register
+    write(d_reg, d_val);
+
+    return 1;
+}
+
 uint8_t spg290::ANDX()
 {
 	// d: destination reg
