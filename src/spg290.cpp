@@ -81,6 +81,45 @@ void spg290::clock()
 	cycles--;
 }
 
+uint8_t spg290::ADDCX()
+{
+    // Destination and source registers
+    uint32_t d, a, b;
+    uint8_t d_reg, a_reg, b_reg;
+    bool carry_in, carry_out;
+    uint64_t sum;
+
+    // Extract register positions from the instruction word
+    d_reg = (instr & 0x3E00000) >> 21;  // Bits 25-21
+    a_reg = (instr & 0x1F0000) >> 16;    // Bits 20-16
+    b_reg = (instr & 0x7C00) >> 10;       // Bits 14-10
+
+    // Read values from registers
+    a = read(a_reg);
+    b = read(b_reg);
+
+    // Retrieve current carry flag
+    carry_in = GetFlag(C);
+
+    // Perform addition with carry
+    sum = (uint64_t)a + (uint64_t)b + (carry_in ? 1 : 0);
+    d = sum & 0xFFFFFFFF;          // Truncate to 32 bits
+    carry_out = (sum >> 32) != 0;  // Determine carry out
+
+    // Update flags if CU bit is set
+    if (instr & CU_MASK)
+    {
+        SetFlag(Z, d == 0);              // Zero flag
+        SetFlag(N, (d >> 31) == 0);      // Negative flag (as per example convention)
+        SetFlag(C, carry_out);           // Carry flag
+    }
+
+    // Write result to destination register
+    write(d_reg, d);
+
+    return 1;  // Return cycle count or status
+}
+
 uint8_t spg290::ANDX()
 {
 	// d: destination reg
