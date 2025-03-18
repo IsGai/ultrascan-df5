@@ -365,6 +365,36 @@ uint8_t spg290::ANDRIX()
 	return 1;
 }
 
+uint8_t spg290::BITTSTX()
+{
+    // a: source reg
+    uint8_t a_reg, bn;
+    uint32_t a;
+    
+    // Extract register and bit number from instruction word
+    a_reg = (instr & 0x1F0000) >> 16; // bits 20-16 (rA)
+    bn = (instr & 0x7C00) >> 10;      // bits 14-10 (BN)
+    
+    // Read the value from register rA
+    a = read(a_reg);
+    
+    // Compute the bit mask and test the bit
+    uint32_t bit_mask = 1 << bn;
+    uint32_t bit_value = a & bit_mask;
+    
+    // Update flags if CU bit is set (always true for .c suffix)
+    if (instr & CU_MASK)
+    {
+        // Z is set if the tested bit is 0
+        SetFlag(Z, bit_value == 0);
+        // N is set if the tested bit is the sign bit (bit 31) and it's set
+        SetFlag(N, (bit_value >> 31) & 1);
+    }
+    
+    return 1; // Execution cycle count
+}
+
+
 uint8_t spg290::ORX()
 {
     // d: destination reg
