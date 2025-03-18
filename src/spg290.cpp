@@ -154,6 +154,42 @@ uint8_t spg290::ADDIX()
     return 1;
 }
 
+uint8_t spg290::ADDISX()
+{
+    uint32_t d_val;
+    uint8_t d_reg;
+    int32_t imm16;
+
+    // Extract destination register rD from bits 25-21
+    d_reg = (instr & 0x3E00000) >> 21;
+
+    // Extract the 16-bit signed immediate value (SImm16) from bits 15-0 and sign-extend
+    imm16 = (int16_t)(instr & 0xFFFF);
+
+    // Read the current value of register rD
+    d_val = read(d_reg);
+
+    // Calculate the 16-bit left-shifted immediate value
+    uint32_t shifted_imm = (uint32_t)imm16 << 16;
+
+    // Perform the addition
+    d_val += shifted_imm;
+
+    // Check if the CU bit is set to update condition flags
+    if (instr & CU_MASK)
+    {
+        // Set Z flag if the result is zero
+        SetFlag(Z, d_val == 0);
+        // Set N flag if the result is negative (highest bit is 1)
+        SetFlag(N, (d_val >> 31) != 0);
+    }
+
+    // Write the result back to register rD
+    write(d_reg, d_val);
+
+    return 1;
+}
+
 uint8_t spg290::ANDX()
 {
 	// d: destination reg
