@@ -294,6 +294,42 @@ uint8_t spg290::ANDIX()
 	return 1;
 }
 
+uint8_t spg290::ANDISX()
+{
+    uint32_t d, a, imm_shifted;
+    uint8_t d_reg;
+    uint16_t imm16;
+    
+    // Extract destination register (rD) from bits 25-21
+    d_reg = (instr & 0x3E00000) >> 21;
+
+    // Extract Imm16 from bits 15-0
+    imm16 = instr & 0xFFFF;
+
+    // Shift Imm16 left by 16 bits to form the 32-bit value
+    imm_shifted = (uint32_t)imm16 << 16;
+
+    // Read current value of rD (source operand)
+    a = read(d_reg);
+
+    // Perform the AND operation
+    d = a & imm_shifted;
+
+    // Check if condition flags need to be updated
+    if (instr & CU_MASK)
+    {
+        // If result is 0, set Z flag
+        SetFlag(Z, d == 0);
+        // If result's MSB is 0, set N flag (following ORX's convention)
+        SetFlag(N, (d >> 31) == 0);
+    }
+
+    // Write the result back to rD
+    write(d_reg, d);
+
+    return 1;
+}
+
 uint8_t spg290::ANDRIX()
 {
 	// d: destination reg
