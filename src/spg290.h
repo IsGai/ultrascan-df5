@@ -105,7 +105,7 @@ private:
 	uint8_t ANDIX();	// Logical AND with Immediate
 	uint8_t ANDISX();
 	uint8_t ANDRIX();	// Logical AND Register with Immediate
-	uint8_t BITTSTX();	
+	uint8_t BITTSTC();	
 	uint8_t CEINST();	
 	uint8_t ORX();	
 };

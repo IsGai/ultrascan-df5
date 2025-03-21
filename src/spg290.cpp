@@ -91,10 +91,10 @@ uint8_t spg290::ADDCX()
     bool carry_in, carry_out;
     uint64_t sum;
 
-    // Extract register positions from the instruction word
-    d_reg = (instr & 0x3E00000) >> 21;  // Bits 25-21
-    a_reg = (instr & 0x1F0000) >> 16;    // Bits 20-16
-    b_reg = (instr & 0x7C00) >> 10;       // Bits 14-10
+    // Extract register locations from instruction word
+	d_reg = (instr & 0x3E00000) >> 21;	// bits 25-21 (see s+core7 pg. 12)
+	a_reg = (instr & 0x1F0000) >> 16;	// bits 20-16 (see s+core7 pg. 12)
+	b_reg = (instr & 0x7C00) >> 10;		// bits 14-10 (see s+core7 pg. 12)
 
     // Read values from registers
     a = read(a_reg);
@@ -112,7 +112,7 @@ uint8_t spg290::ADDCX()
     if (instr & CU_MASK)
     {
         SetFlag(Z, d == 0);              // Zero flag
-        SetFlag(N, (d >> 31) == 0);      // Negative flag (as per example convention)
+        SetFlag(N, (d >> 31) == 0);      // Negative flag 
         SetFlag(C, carry_out);           // Carry flag
     }
 
