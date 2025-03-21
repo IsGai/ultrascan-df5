@@ -367,7 +367,7 @@ uint8_t spg290::ANDRIX()
 	return 1;
 }
 
-uint8_t spg290::BITTSTX()
+uint8_t spg290::BITTSTC()
 {
     // a: source reg
     uint8_t a_reg, bn;
@@ -397,6 +397,7 @@ uint8_t spg290::BITTSTX()
 }
 
 uint8_t spg290::CEINST() {
+    //THIS METHOD IS ALL WRONG BUT MAY BE ABLE TO USE OUTLINE
     uint32_t a = 0, b = 0, result = 0;
     uint8_t func5, usd1, rA_reg, rB_reg, usd2, dest_reg;
 
