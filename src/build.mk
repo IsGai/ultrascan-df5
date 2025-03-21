@@ -16,15 +16,15 @@ $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 # compile main
-main.o: main.cpp Bus.h spg290.h
+main.o: main.cpp Bus.o spg290.o
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # compile spg290
-spg290.o: spg290.cpp spg290.h Bus.h 
+spg290.o: spg290.cpp Bus.o 
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # compile bus
-Bus.o: Bus.cpp Bus.h 
+Bus.o: Bus.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean build files

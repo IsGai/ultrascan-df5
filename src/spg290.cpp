@@ -1,5 +1,7 @@
 #include "spg290.h"
 #include <iostream>
+#include <stdint.h>
+#include <string>
 #include "Bus.h"
 
 spg290::spg290()
@@ -418,7 +420,7 @@ uint8_t spg290::CEINST() {
     //    b = read(rB_reg);
 
     // Execute custom operation based on func5
-    switch (func5) {
+    //switch (func5) {
         // Example operation: ADD with USD1 as destination
         //case CE_ADD:
         //    result = a + b;
@@ -430,10 +432,10 @@ uint8_t spg290::CEINST() {
         //    dest_reg = usd1;
         //    break;
         // Handle other custom operations...
-        default:
+        //default:
         //    throw CeE_Exception(); // Custom engine execution exception
         //    return 0;
-    }
+    //}
 
     // Write result to destination (could be USD1, USD2, or another reg)
     write(dest_reg, result);

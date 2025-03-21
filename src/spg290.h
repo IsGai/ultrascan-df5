@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <stdint.h>
+#include <string>
 
 class Bus;
 
@@ -106,5 +108,4 @@ private:
 	uint8_t BITTSTX();	
 	uint8_t CEINST();	
 	uint8_t ORX();	
-	uint8_t UNDEF();	// catches undefined opcodes
 };
