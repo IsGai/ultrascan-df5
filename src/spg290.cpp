@@ -406,33 +406,33 @@ uint8_t spg290::CEINST() {
     usd2   = (instr & 0x3E0)      >> 5;  // USD2:  bits 9-5
 
     // Check if custom engine supports this func5 operation
-    if (!IsCustomOpSupported(func5)) {
-        throw RI_Exception(); // Reserved instruction exception
-        return 0;
-    }
+    //if (!IsCustomOpSupported(func5)) {
+    //    throw RI_Exception(); // Reserved instruction exception
+    //    return 0;
+    //}
 
     // Fetch source operands if required by the operation
-    if (OperationUsesSourceA(func5))
-        a = read(rA_reg);
-    if (OperationUsesSourceB(func5))
-        b = read(rB_reg);
+    //if (OperationUsesSourceA(func5))
+    //    a = read(rA_reg);
+    //if (OperationUsesSourceB(func5))
+    //    b = read(rB_reg);
 
     // Execute custom operation based on func5
     switch (func5) {
         // Example operation: ADD with USD1 as destination
-        case CE_ADD:
-            result = a + b;
-            dest_reg = usd1;
-            break;
+        //case CE_ADD:
+        //    result = a + b;
+        //    dest_reg = usd1;
+        //    break;
         // Example operation: AND with immediate USD2 and store in USD1
-        case CE_ANDI:
-            result = a & usd2;
-            dest_reg = usd1;
-            break;
+        //case CE_ANDI:
+        //    result = a & usd2;
+        //    dest_reg = usd1;
+        //    break;
         // Handle other custom operations...
         default:
-            throw CeE_Exception(); // Custom engine execution exception
-            return 0;
+        //    throw CeE_Exception(); // Custom engine execution exception
+        //    return 0;
     }
 
     // Write result to destination (could be USD1, USD2, or another reg)
